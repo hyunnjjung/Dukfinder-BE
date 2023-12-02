@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/.idea/Dukfinder-BE.iml" filepath="$PROJECT_DIR$/.idea/Dukfinder-BE.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/.idea/gotogithub.iml" filepath="$PROJECT_DIR$/.idea/gotogithub.iml" />
+>>>>>>> 6b6610e5b41f453924c4a7f1a1f179718819897c
     </modules>
   </component>
 </project>
