@@ -10,11 +10,6 @@ from django.db.models import Q
 
 
 class CustomReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.method == 'GET' and request.user.is_authenticated:
-            return True
-        return False
-
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
@@ -24,7 +19,7 @@ class CustomReadOnly(permissions.BasePermission):
 
 class CategoryPostsView(generics.ListAPIView):
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         category = self.kwargs['category']
@@ -34,7 +29,7 @@ class CategoryPostsView(generics.ListAPIView):
 class FindPostListView(generics.ListAPIView): #lostpostlist
     queryset = FindPost.objects.order_by('-created_at')
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -42,22 +37,22 @@ class FindPostListView(generics.ListAPIView): #lostpostlist
 class FindPostDetailView(generics.RetrieveDestroyAPIView): #Findpostlistdetail, destory
     queryset = FindPost.objects.all()
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 class FindPostCreateView(CreateAPIView): #lostpostlistcreate
     queryset = FindPost.objects.all()
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 class FindPostUpdateView(generics.RetrieveUpdateAPIView):
     queryset = FindPost.objects.all()
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     lookup_url_kwarg = 'intLpk'
 
 class ThisWeekPostsListView(generics.ListAPIView):
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         today = timezone.now().date()
         start_of_week = today - timedelta(days=today.weekday())
@@ -68,7 +63,7 @@ class ThisWeekPostsListView(generics.ListAPIView):
 
 class ThisMonthPostsListView(generics.ListAPIView):
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         today = timezone.now().date()
@@ -81,7 +76,7 @@ class ThisMonthPostsListView(generics.ListAPIView):
 
 class FindPostSearchAPIView(generics.ListAPIView):
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         query = self.request.query_params.get('q', '')
         return FindPost.objects.filter(Q(title__icontains=query))
@@ -90,10 +85,10 @@ class FindPostSearchAPIView(generics.ListAPIView):
 class FindCommentViewSet(viewsets.ModelViewSet):
     queryset = FindComment.objects.prefetch_related('replys')
     serializer_class = FindCommentSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class FindReplyViewSet(viewsets.ModelViewSet):
     queryset = FindReply.objects.all()
     serializer_class = FindReplySerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
