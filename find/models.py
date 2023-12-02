@@ -26,6 +26,8 @@ class FindPost(models.Model):
 
     category = models.CharField(max_length=20, blank=True, null=True, choices=CATEGORY_CHOICES)
 
+    LostAndFound = models.TextField(max_length=15, null=True)  # 보관장소
+
     LOCATION_CHOICES = [
         ('정문·대학본부', '정문·대학본부'),
         ('후문', '후문'),

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'notice',
     'find',
     'lost',
+    'user',
     'drf_yasg',
     'corsheaders'
 ]
