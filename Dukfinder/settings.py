@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-xtsop=144^=7vd4(h$)y$*bj=dhb-k#c3v%vqau=_*)!0q7-mj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://port-0-dukfinder-57lz2alpp5sfxw.sel4.cloudtype.app/']
+ALLOWED_HOSTS = ['port-0-dukfinder-57lz2alpp5sfxw.sel4.cloudtype.app']
 
 # Application definition
 
@@ -50,12 +50,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_WHITELIST = (
-    'http://127.0.0.1:7000', 'http://localhost:3000')
+    'http://127.0.0.1:8000', 'http://localhost:3000')
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-ALLOWED_HOSTS = ['*']
 
 ROOT_URLCONF = 'Dukfinder.urls'
 
