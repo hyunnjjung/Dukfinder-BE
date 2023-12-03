@@ -7,7 +7,7 @@ class FindPost(models.Model):
 
     content = models.TextField()
 
-    head_image = models.ImageField(upload_to='find/images/%Y/%m/%d/', blank=True)
+    head_image = models.ImageField(upload_to='find/images/%Y/%m/%d/', blank=True, default='noimage.jpg')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -49,6 +49,11 @@ class FindPost(models.Model):
 
     def get_absolute_url(self):
         return f'/blog/{self.pk}/'
+
+    def save(self, *args, **kwargs):
+        if not self.head_image:
+            self.head_image = 'default.png'
+        super().save(*args, **kwargs)
 
 class FindComment(models.Model):
     user_id = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
