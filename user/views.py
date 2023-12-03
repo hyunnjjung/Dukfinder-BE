@@ -2,7 +2,7 @@ from .serializers import RegisterSerializer, LoginSerializer, ProfileSerializer,
 from .models import Profile
 from .permissions import CustomReadOnly
 from django.contrib.auth import logout
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # 로그인
 from django.contrib.auth.models import User
@@ -21,10 +21,12 @@ from rest_framework.views import APIView
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
 
 # 로그인
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
