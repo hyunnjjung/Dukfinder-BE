@@ -13,9 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-xtsop=144^=7vd4(h$)y$*bj=dhb-k#c3v%vqau=_*)!0q7-mj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://port-0-dukfinder-57lz2alpp5sfxw.sel4.cloudtype.app/']
 
 # Application definition
 
