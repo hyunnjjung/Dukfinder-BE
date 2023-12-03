@@ -16,7 +16,7 @@ class CategoryPostsView(generics.ListAPIView):
 
     def get_queryset(self):
         category = self.kwargs['category']
-        return LostPost.objects.filter(category=category)
+        return LostPost.objects.filter(category=category).order_by('created_at')
 
 
 class LostPostListView(generics.ListAPIView): #lostpostlist
@@ -32,6 +32,14 @@ class LostPostDetailView(generics.RetrieveDestroyAPIView): #Findpostlistdetail, 
     serializer_class = LostPostSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def perform_destroy(self, instance):
+        user = self.request.user
+        if user == instance.author or user.is_staff or user.is_superuser:
+            instance.delete()
+        else:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to delete this post.")
+
 
 class LostPostCreateView(CreateAPIView): #lostpostlistcreate
     queryset = LostPost.objects.all()
@@ -42,7 +50,15 @@ class LostPostUpdateView(generics.RetrieveUpdateAPIView):
     queryset = LostPost.objects.all()
     serializer_class = LostPostSerializer
     lookup_url_kwarg = 'intLpk'
-    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_update(self, serializer):
+        user = self.request.user
+
+        if user == serializer.instance.author or user.is_staff or user.is_superuser:
+            serializer.save()
+        else:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to update this post.")
 
 class ThisWeekPostsListView(generics.ListAPIView):
     serializer_class = LostPostSerializer
@@ -50,9 +66,9 @@ class ThisWeekPostsListView(generics.ListAPIView):
     def get_queryset(self):
         today = timezone.now().date()
         start_of_week = today - timedelta(days=today.weekday())
-        end_of_week = start_of_week + timedelta(days=6)
+        end_of_week = start_of_week + timedelta(days=7)
 
-        queryset = LostPost.objects.filter(created_at__range=[start_of_week, end_of_week])
+        queryset = LostPost.objects.filter(created_at__range=[start_of_week, end_of_week]).order_by('created_at')
         return queryset
 
 class ThisMonthPostsListView(generics.ListAPIView):
@@ -64,7 +80,7 @@ class ThisMonthPostsListView(generics.ListAPIView):
         end_of_month = start_of_month + timedelta(days=32)
         end_of_month = end_of_month.replace(day=1) - timedelta(days=1)
 
-        queryset = LostPost.objects.filter(created_at__range=[start_of_month, end_of_month])
+        queryset = LostPost.objects.filter(created_at__range=[start_of_month, end_of_month]).order_by('created_at')
         return queryset
 
 class LostPostSearchAPIView(generics.ListAPIView):
@@ -72,7 +88,7 @@ class LostPostSearchAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         query = self.request.query_params.get('q', '')
-        return LostPost.objects.filter(Q(title__icontains=query))
+        return LostPost.objects.filter(Q(title__icontains=query)).order_by('created_at')
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -80,8 +96,28 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_permissions(self):
+        if self.action == 'destroy':
+            self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
+        return super().get_permissions()
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
+class IsCommentOwnerOrStaffOrSuperuser(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return hasattr(obj, 'author') and (obj.author == request.user or request.user.is_staff or request.user.is_superuser)
+
 
 class ReplyViewSet(viewsets.ModelViewSet):
     queryset = Reply.objects.all()
     serializer_class = ReplySerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action == 'destroy':
+            self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
+        return super().get_permissions()
+
+    def perform_destroy(self, instance):
+        instance.delete()

@@ -8,24 +8,13 @@ from datetime import timedelta
 from .serializers import FindPostSerializer, FindCommentSerializer, FindReplySerializer
 from django.db.models import Q
 
-
-class CustomReadOnly(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        elif request.method == 'DELETE':
-            return obj.user == request.user or request.user.is_superuser
-        else:
-            return obj.user == request.user or request.user.is_superuser
-
-
 class CategoryPostsView(generics.ListAPIView):
     serializer_class = FindPostSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         category = self.kwargs['category']
-        return FindPost.objects.filter(category=category)
+        return FindPost.objects.filter(category=category).order_by('created_at')
 
 
 class FindPostListView(generics.ListAPIView): #lostpostlist
@@ -39,7 +28,16 @@ class FindPostListView(generics.ListAPIView): #lostpostlist
 class FindPostDetailView(generics.RetrieveDestroyAPIView): #Findpostlistdetail, destory
     queryset = FindPost.objects.all()
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        if user == instance.author or user.is_staff or user.is_superuser:
+            instance.delete()
+        else:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to delete this post.")
 
 class FindPostCreateView(CreateAPIView): #lostpostlistcreate
     queryset = FindPost.objects.all()
@@ -49,18 +47,29 @@ class FindPostCreateView(CreateAPIView): #lostpostlistcreate
 class FindPostUpdateView(generics.RetrieveUpdateAPIView):
     queryset = FindPost.objects.all()
     serializer_class = FindPostSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_update(self, serializer):
+        user = self.request.user
+
+        if user == serializer.instance.author or user.is_staff or user.is_superuser:
+            serializer.save()
+        else:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to update this post.")
+
     lookup_url_kwarg = 'intLpk'
 
 class ThisWeekPostsListView(generics.ListAPIView):
     serializer_class = FindPostSerializer
     permission_classes = [permissions.IsAuthenticated]
+
     def get_queryset(self):
         today = timezone.now().date()
         start_of_week = today - timedelta(days=today.weekday())
-        end_of_week = start_of_week + timedelta(days=6)
+        end_of_week = start_of_week + timedelta(days=7)
 
-        queryset = FindPost.objects.filter(created_at__range=[start_of_week, end_of_week])
+        queryset = FindPost.objects.filter(created_at__range=[start_of_week, end_of_week]).order_by('-created_at')
         return queryset
 
 class ThisMonthPostsListView(generics.ListAPIView):
@@ -73,7 +82,7 @@ class ThisMonthPostsListView(generics.ListAPIView):
         end_of_month = start_of_month + timedelta(days=32)
         end_of_month = end_of_month.replace(day=1) - timedelta(days=1)
 
-        queryset = FindPost.objects.filter(created_at__range=[start_of_month, end_of_month])
+        queryset = FindPost.objects.filter(created_at__range=[start_of_month, end_of_month]).order_by('-created_at')
         return queryset
 
 class FindPostSearchAPIView(generics.ListAPIView):
@@ -81,16 +90,38 @@ class FindPostSearchAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         query = self.request.query_params.get('q', '')
-        return FindPost.objects.filter(Q(title__icontains=query))
+        return FindPost.objects.filter(Q(title__icontains=query)).order_by('created_at')
 
 
 class FindCommentViewSet(viewsets.ModelViewSet):
     queryset = FindComment.objects.prefetch_related('replys')
     serializer_class = FindCommentSerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action == 'destroy':
+            self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
+        return super().get_permissions()
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
+class IsCommentOwnerOrStaffOrSuperuser(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return hasattr(obj, 'author') and (obj.author == request.user or request.user.is_staff or request.user.is_superuser)
+
 
 
 class FindReplyViewSet(viewsets.ModelViewSet):
     queryset = FindReply.objects.all()
     serializer_class = FindReplySerializer
-    permission_classes = [CustomReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action == 'destroy':
+            self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
+        return super().get_permissions()
+
+    def perform_destroy(self, instance):
+        instance.delete()
