@@ -17,6 +17,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = ['https://port-0-dukfinder-57lz2alpp5sfxw.sel4.cloudtype.app/']
+
 # Application definition
 
 INSTALLED_APPS = [
