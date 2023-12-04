@@ -21,8 +21,9 @@ class NoticePostCreateView(generics.CreateAPIView):
     permission_classes = [IsStaffOrSuperuser]
 
     def perform_create(self, serializer):
-        serializer.save()
+        serializer.save(author=self.request.user)
         return HttpResponseRedirect(reverse('notice-list'))
+
 
 class NoticePostDetailView(generics.RetrieveDestroyAPIView):
     queryset = NoticePost.objects.all()
