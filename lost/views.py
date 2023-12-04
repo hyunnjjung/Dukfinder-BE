@@ -104,6 +104,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.delete()
 
+    def perform_create(self, serializer):
+        # 현재 로그인한 사용자의 ID를 Comment 객체에 저장
+        serializer.save(author=self.request.user)
+
 
 class IsCommentOwnerOrStaffOrSuperuser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -121,3 +125,7 @@ class ReplyViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.delete()
+
+    def perform_create(self, serializer):
+        # 현재 로그인한 사용자의 ID를 Comment 객체에 저장
+        serializer.save(author=self.request.user)
