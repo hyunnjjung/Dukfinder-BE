@@ -108,7 +108,7 @@ class FindCommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         # 현재 로그인한 사용자의 ID를 Comment 객체에 저장
-        serializer.save(author=self.request.user)
+        serializer.save(user_id=self.request.user)
 
 
 class IsCommentOwnerOrStaffOrSuperuser(permissions.BasePermission):
@@ -132,4 +132,4 @@ class FindReplyViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         # 현재 로그인한 사용자의 ID를 Comment 객체에 저장
-        serializer.save(author=self.request.user)
+        serializer.save(user_id=self.request.user)
