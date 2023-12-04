@@ -1,7 +1,6 @@
 
 import os
 from pathlib import Path
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,9 +13,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-xtsop=144^=7vd4(h$)y$*bj=dhb-k#c3v%vqau=_*)!0q7-mj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True # false로 변경
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CSRF_TRUSTED_ORIGINS = ['https://port-0-dukfinder-57lz2alpp5sfxw.sel4.cloudtype.app']
 
 # Application definition
 
@@ -30,10 +31,10 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'user',
     'notice',
     'find',
     'lost',
-    'user',
     'drf_yasg',
     'corsheaders'
 ]
@@ -51,12 +52,15 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_WHITELIST = (
-    'http://127.0.0.1:8000', 'http://localhost:3000')
+    'http://127.0.0.1:8000', 'http://localhost:3000', 'https://port-0-dukfinder-57lz2alpp5sfxw.sel4.cloudtype.app') 
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-ALLOWED_HOSTS = ['*']
+# 추
+USE_X_FORWARDED_PORT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 ROOT_URLCONF = 'Dukfinder.urls'
 
