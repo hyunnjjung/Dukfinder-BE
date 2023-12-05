@@ -102,14 +102,13 @@ class FindCommentViewSet(viewsets.ModelViewSet):
     serializer_class = FindCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
-        post_pk = self.kwargs.get('post_pk')
-        post = get_object_or_404(FindPost, pk=post_pk)
-        serializer.save(post_id=post, user_id=self.request.user)
-
     def get_queryset(self):
         post_pk = self.kwargs.get('post_pk')
         return FindComment.objects.filter(post_id=post_pk)
+
+    def perform_create(self, serializer):
+
+        serializer.save(user_id=self.request.user)
 
 
 
@@ -117,6 +116,10 @@ class FindReplyViewSet(viewsets.ModelViewSet):
     queryset = FindReply.objects.all()
     serializer_class = FindReplySerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        post_pk = self.kwargs.get('post_pk')
+        return FindReply.objects.filter(comment=post_pk)
 
 
     def perform_create(self, serializer):
