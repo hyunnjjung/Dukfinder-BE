@@ -109,6 +109,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
         return super().get_permissions()
 
+
     def perform_destroy(self, instance):
         instance.delete()
 
