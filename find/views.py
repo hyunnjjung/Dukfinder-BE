@@ -108,10 +108,11 @@ class FindCommentViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         user = self.request.user
-        if user == instance.user or user.is_staff or user.is_superuser:
+        if user == instance.author or user.is_staff or user.is_superuser:
             instance.delete()
         else:
-            raise permissions.PermissionDenied("You do not have permission to delete this comment.")
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to delete this post.")
 
     def perform_create(self, serializer):
 
@@ -130,10 +131,11 @@ class FindReplyViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         user = self.request.user
-        if user == instance.user or user.is_staff or user.is_superuser:
+        if user == instance.author or user.is_staff or user.is_superuser:
             instance.delete()
         else:
-            raise permissions.PermissionDenied("You do not have permission to delete this comment.")
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to delete this post.")
 
     def perform_create(self, serializer):
 
