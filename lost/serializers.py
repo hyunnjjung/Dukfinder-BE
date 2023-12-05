@@ -11,7 +11,7 @@ class ReplySerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     replys = ReplySerializer(many=True, read_only=True)
-
+    user_id = serializers.StringRelatedField()
 
     class Meta:
         model = Comment
