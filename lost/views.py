@@ -104,23 +104,17 @@ class CommentViewSet(viewsets.ModelViewSet):
         post_pk = self.kwargs.get('post_pk')
         return Comment.objects.filter(post_id=post_pk)
 
-    def get_permissions(self):
-        if self.action == 'destroy':
-            self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
-        return super().get_permissions()
-
-
     def perform_destroy(self, instance):
-        instance.delete()
+        user = self.request.user
+        if user == instance.user or user.is_staff or user.is_superuser:
+            instance.delete()
+        else:
+            raise permissions.PermissionDenied("You do not have permission to delete this comment.")
 
     def perform_create(self, serializer):
 
         serializer.save(user_id=self.request.user)
 
-
-class IsCommentOwnerOrStaffOrSuperuser(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return hasattr(obj, 'author') and (obj.author == request.user or request.user.is_staff or request.user.is_superuser)
 
 
 class ReplyViewSet(viewsets.ModelViewSet):
@@ -131,13 +125,13 @@ class ReplyViewSet(viewsets.ModelViewSet):
         post_pk = self.kwargs.get('post_pk')
         return Reply.objects.filter(comment=post_pk)
 
-    def get_permissions(self):
-        if self.action == 'destroy':
-            self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
-        return super().get_permissions()
-
     def perform_destroy(self, instance):
-        instance.delete()
+        user = self.request.user
+        if user == instance.user or user.is_staff or user.is_superuser:
+            instance.delete()
+        else:
+            raise permissions.PermissionDenied("You do not have permission to delete this comment.")
+
 
     def perform_create(self, serializer):
 
