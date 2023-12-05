@@ -1,6 +1,7 @@
 
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, permissions, viewsets, status
 from rest_framework.generics import CreateAPIView, get_object_or_404
+from rest_framework.response import Response
 
 from .models import FindPost, FindComment, FindReply
 from django.utils import timezone
@@ -107,8 +108,17 @@ class FindCommentViewSet(viewsets.ModelViewSet):
         return FindComment.objects.filter(post_id=post_pk)
 
     def perform_create(self, serializer):
+        new_comment = serializer.save(user_id=self.request.user)
+        comment_id = new_comment.id
 
-        serializer.save(user_id=self.request.user)
+        # Modify the response data to include the comment_id
+        response_data = {
+            'id': comment_id,
+            'message': 'Comment created successfully',  # You can customize the message
+            # Add any other fields you want to include in the response
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 
