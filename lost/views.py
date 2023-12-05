@@ -95,6 +95,7 @@ class LostPostSearchAPIView(generics.ListAPIView):
         return LostPost.objects.filter(Q(title__icontains=query)).order_by('created_at')
 
 
+
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.prefetch_related('replys')
     serializer_class = CommentSerializer
@@ -102,8 +103,12 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         post_pk = self.kwargs.get('post_pk')
-        lost_post = get_object_or_404(LostPost, pk=post_pk)
-        serializer.save(post_id=lost_post, user_id=self.request.user)
+        post = get_object_or_404(LostPost, pk=post_pk)
+        serializer.save(post_id=post, user_id=self.request.user)
+
+    def get_queryset(self):
+        post_pk = self.kwargs.get('post_pk')
+        return Comment.objects.filter(post_id=post_pk)
 
 
 
@@ -112,6 +117,9 @@ class ReplyViewSet(viewsets.ModelViewSet):
     serializer_class = ReplySerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        post_pk = self.kwargs.get('post_pk')
+        return Reply.objects.filter(comment=post_pk)
 
 
     def perform_create(self, serializer):

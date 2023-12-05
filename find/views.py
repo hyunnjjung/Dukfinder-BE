@@ -1,6 +1,6 @@
 
 from rest_framework import generics, permissions, viewsets
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, get_object_or_404
 
 from .models import FindPost, FindComment, FindReply
 from django.utils import timezone
@@ -102,10 +102,14 @@ class FindCommentViewSet(viewsets.ModelViewSet):
     serializer_class = FindCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
     def perform_create(self, serializer):
+        post_pk = self.kwargs.get('post_pk')
+        post = get_object_or_404(FindPost, pk=post_pk)
+        serializer.save(post_id=post, user_id=self.request.user)
 
-        serializer.save(user_id=self.request.user)
+    def get_queryset(self):
+        post_pk = self.kwargs.get('post_pk')
+        return FindComment.objects.filter(post_id=post_pk)
 
 
 
