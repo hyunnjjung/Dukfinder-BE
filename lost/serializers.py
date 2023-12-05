@@ -11,7 +11,7 @@ class ReplySerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     replys = ReplySerializer(many=True, read_only=True)
-    user_id = serializers.StringRelatedField()
+
 
     class Meta:
         model = Comment
@@ -24,4 +24,4 @@ class LostPostSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField()
     class Meta:
         model = LostPost
-        fields = ("title", "content", "head_image", "created_at", "updated_at", "author", "date_select", "category", "location", "found_status" , "comments")
+        fields = '__all__'
