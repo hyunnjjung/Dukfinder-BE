@@ -3,6 +3,7 @@ from .models import LostPost, Comment, Reply
 
 
 class ReplySerializer(serializers.ModelSerializer):
+    user_id = serializers.StringRelatedField()
     class Meta:
         model = Reply
         fields = ('user_id', 'comment_id', 'content', 'created_at', 'updated_at')
@@ -10,6 +11,8 @@ class ReplySerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     replys = ReplySerializer(many=True, read_only=True)
+    user_id = serializers.StringRelatedField()
+
 
     class Meta:
         model = Comment
@@ -19,6 +22,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class LostPostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
+    author = serializers.StringRelatedField()
     class Meta:
         model = LostPost
         fields = '__all__'

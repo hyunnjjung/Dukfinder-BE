@@ -3,6 +3,7 @@ from .models import FindPost, FindComment, FindReply
 
 
 class FindReplySerializer(serializers.ModelSerializer):
+    user_id = serializers.StringRelatedField()
     class Meta:
         model = FindReply
         fields = ('user_id', 'comment_id', 'content', 'created_at', 'updated_at')
@@ -10,6 +11,7 @@ class FindReplySerializer(serializers.ModelSerializer):
 
 class FindCommentSerializer(serializers.ModelSerializer):
     replys = FindReplySerializer(many=True, read_only=True)
+    user_id = serializers.StringRelatedField()
 
     class Meta:
         model = FindComment
@@ -19,6 +21,7 @@ class FindCommentSerializer(serializers.ModelSerializer):
 
 class FindPostSerializer(serializers.ModelSerializer):
     comments = FindCommentSerializer(many=True, read_only=True)
+    author = serializers.StringRelatedField()
     class Meta:
         model = FindPost
         fields = '__all__'

@@ -46,6 +46,10 @@ class LostPostCreateView(CreateAPIView): #lostpostlistcreate
     serializer_class = LostPostSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def perform_create(self, serializer):
+        # 현재 로그인한 사용자의 ID를 Comment 객체에 저장
+        serializer.save(author=self.request.user)
+
 class LostPostUpdateView(generics.RetrieveUpdateAPIView):
     queryset = LostPost.objects.all()
     serializer_class = LostPostSerializer
