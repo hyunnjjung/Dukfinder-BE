@@ -102,6 +102,10 @@ class FindCommentViewSet(viewsets.ModelViewSet):
     serializer_class = FindCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        post_pk = self.kwargs.get('post_pk')
+        return FindComment.objects.filter(post_id=post_pk)
+
     def get_permissions(self):
         if self.action == 'destroy':
             self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
@@ -111,7 +115,7 @@ class FindCommentViewSet(viewsets.ModelViewSet):
         instance.delete()
 
     def perform_create(self, serializer):
-        # 현재 로그인한 사용자의 ID를 Comment 객체에 저장
+
         serializer.save(user_id=self.request.user)
 
 
@@ -126,6 +130,10 @@ class FindReplyViewSet(viewsets.ModelViewSet):
     serializer_class = FindReplySerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        post_pk = self.kwargs.get('post_pk')
+        return FindReply.objects.filter(comment=post_pk)
+
     def get_permissions(self):
         if self.action == 'destroy':
             self.permission_classes = [IsCommentOwnerOrStaffOrSuperuser]
@@ -135,5 +143,5 @@ class FindReplyViewSet(viewsets.ModelViewSet):
         instance.delete()
 
     def perform_create(self, serializer):
-        # 현재 로그인한 사용자의 ID를 Comment 객체에 저장
+
         serializer.save(user_id=self.request.user)
