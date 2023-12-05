@@ -24,4 +24,4 @@ class FindPostSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField()
     class Meta:
         model = FindPost
-        fields = '__all__'
+        fields = ("title", "content", "head_image", "created_at", "updated_at", "author",  "category", "location", "LostAndFound", "comments")

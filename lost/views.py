@@ -1,6 +1,6 @@
 
 from rest_framework import generics, permissions, viewsets
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, get_object_or_404
 
 from .models import LostPost, Comment, Reply
 from django.utils import timezone
@@ -100,24 +100,18 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        post_pk = self.kwargs.get('post_pk')
-        return Comment.objects.filter(post_id=post_pk)
-
-
     def perform_create(self, serializer):
-
-        serializer.save(user_id=self.request.user)
+        post_pk = self.kwargs.get('post_pk')
+        lost_post = get_object_or_404(LostPost, pk=post_pk)
+        serializer.save(post_id=lost_post, user_id=self.request.user)
 
 
 
 class ReplyViewSet(viewsets.ModelViewSet):
     queryset = Reply.objects.all()
     serializer_class = ReplySerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        post_pk = self.kwargs.get('post_pk')
-        return Reply.objects.filter(comment=post_pk)
 
 
     def perform_create(self, serializer):
