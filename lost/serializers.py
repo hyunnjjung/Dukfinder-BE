@@ -6,7 +6,7 @@ class ReplySerializer(serializers.ModelSerializer):
     user_id = serializers.StringRelatedField()
     class Meta:
         model = Reply
-        fields = ('user_id', 'comment_id', 'content', 'created_at', 'updated_at')
+        fields = ('id', 'user_id', 'comment_id', 'content', 'created_at', 'updated_at')
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -15,7 +15,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('user_id', 'post_id', 'content', 'created_at', 'updated_at', 'replys')
+        fields = ('id', 'user_id', 'post_id', 'content', 'created_at', 'updated_at', 'replys')
 
 
 

@@ -6,7 +6,7 @@ class FindReplySerializer(serializers.ModelSerializer):
     user_id = serializers.StringRelatedField()
     class Meta:
         model = FindReply
-        fields = ('user_id', 'comment_id', 'content', 'created_at', 'updated_at')
+        fields = ('id', 'user_id', 'comment_id', 'content', 'created_at', 'updated_at')
 
 
 class FindCommentSerializer(serializers.ModelSerializer):
@@ -15,7 +15,7 @@ class FindCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FindComment
-        fields = ('user_id', 'post_id', 'content', 'created_at', 'updated_at', 'replys')
+        fields = ('id', 'user_id', 'post_id', 'content', 'created_at', 'updated_at', 'replys')
 
 
 
