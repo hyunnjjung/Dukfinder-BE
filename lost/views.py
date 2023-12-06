@@ -112,8 +112,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         # Modify the response data to include the comment_id
         response_data = {
             'id': comment_id,
-            'message': 'Comment created successfully',  # You can customize the message
-            # Add any other fields you want to include in the response
+            'message': 'Comment created successfully',
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
