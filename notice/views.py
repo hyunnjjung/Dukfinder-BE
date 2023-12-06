@@ -1,5 +1,5 @@
-from django.shortcuts import redirect
-from rest_framework import generics, mixins, permissions
+
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from django.urls import reverse
 from django.http import HttpResponseRedirect
